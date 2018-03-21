@@ -15,3 +15,5 @@
 
 # copy了 OkGo 的样例代码中的OkRx2使用到的 二次封装代码 主要
 
+# project 下 要加个jit pack  maven 库
+
