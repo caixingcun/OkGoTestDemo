@@ -27,6 +27,7 @@ import java.io.Serializable;
  * 描    述：
  * 修订历史：
  * ================================================
+ * 数据bean 基类的基类
  */
 public class SimpleResponse implements Serializable {
 

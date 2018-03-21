@@ -25,6 +25,7 @@ import java.io.Serializable;
  * 描    述：
  * 修订历史：
  * ================================================
+ * 数据bean基类
  */
 public class LzyResponse<T> implements Serializable {
 

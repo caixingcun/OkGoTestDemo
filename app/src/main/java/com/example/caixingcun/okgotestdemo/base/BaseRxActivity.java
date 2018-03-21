@@ -7,6 +7,7 @@ import io.reactivex.disposables.Disposable;
 
 /**
  * Created by caixingcun on 2018/3/21.
+ *  Rx防泄露
  */
 
 public class BaseRxActivity extends AppCompatActivity {
