@@ -1,23 +1,29 @@
 package com.example.caixingcun.okgotestdemo;
 
 import android.graphics.Bitmap;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.Formatter;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.caixingcun.okgotestdemo.base.BaseRxActivity;
 import com.example.caixingcun.okgotestdemo.callback.JsonConvert;
+import com.example.caixingcun.okgotestdemo.module.home.ArticleListBean;
 import com.example.caixingcun.okgotestdemo.model.LzyResponse;
+import com.example.caixingcun.okgotestdemo.module.home.PageBean;
+import com.example.caixingcun.okgotestdemo.net.RxUtils;
 import com.example.caixingcun.okgotestdemo.net.ServerApi;
 import com.example.caixingcun.okgotestdemo.net.Urls;
+import com.example.caixingcun.okgotestdemo.observer.MyDefaultObserver;
+import com.example.caixingcun.okgotestdemo.util.LogUtils;
+import com.example.caixingcun.okgotestdemo.util.ToastUtils;
 import com.google.gson.reflect.TypeToken;
 import com.lzy.okgo.OkGo;
-import com.lzy.okgo.adapter.DefaultCallAdapter;
 import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.callback.FileCallback;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.convert.FileConvert;
 import com.lzy.okgo.convert.StringConvert;
+import com.lzy.okgo.model.HttpMethod;
 import com.lzy.okgo.model.Progress;
 import com.lzy.okgo.model.Response;
 import com.lzy.okrx2.adapter.ObservableBody;
@@ -27,7 +33,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.reflect.Type;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,7 +40,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -43,30 +47,103 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends BaseRxActivity {
+    MainActivity mMainActivity;
+    private TextView mTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mMainActivity = this;
+        mTv = findViewById(R.id.tv);
+        findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               // requestByUtil();
+                requetBySelf();
+            }
+        });
 
         /**
          * okRx2 基本请求  请求/获取 string json jsonArray
          */
-      //   basicRequest();
+
+        //   basicRequest();
         /**
          * 文件下载两种方案  带进度 /不带进度
          */
-      //  downLoadFileRequest();
+        //  downLoadFileRequest();
         /**
          * 文件上传两种方案  带进度/不带进度
          */
-      //  upLoadFileRequest();
+        //  upLoadFileRequest();
 
         /**
          * 统一管理请求    RxUtils + ServerApi
          */
-      //  formatApi();
+        //  formatApi();
+
+    }
+
+    private void requetBySelf() {
+        OkGo.<LzyResponse<PageBean<ArticleListBean>>>get("http://www.wanandroid.com/article/list/0/json")
+                .converter(new JsonConvert<LzyResponse<PageBean<ArticleListBean>>>(new TypeToken<LzyResponse<PageBean<ArticleListBean>>>(){}.getType()))
+                .adapt(new ObservableBody<LzyResponse<PageBean<ArticleListBean>>>())
+                .subscribe(new Observer<LzyResponse<PageBean<ArticleListBean>>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(LzyResponse<PageBean<ArticleListBean>> pageBeanLzyResponse) {
+                        showToast("ok");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showToast("error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                })
+        ;
+    }
+
+    private void requestByUtil() {
+        Type type = new TypeToken<LzyResponse<PageBean<ArticleListBean>>>() {
+        }.getType();
+        RxUtils.<LzyResponse<PageBean<ArticleListBean>>>request(HttpMethod.GET, "http://www.wanandroid.com/article/list/0/json", type)
+                // RxUtils.<LzyResponse<PageBean<ArticleListBean>>>request(HttpMethod.GET, "http://www.wanandroid.com/lg/collect/list/0/json", type)
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(Disposable disposable) throws Exception {
+                        //展示dialog
+                        LogUtils.info("展示dialog");
+                        LogUtils.debug(Thread.currentThread().getName());
+                        showLoading();
+                        mTv.setText("展示dialog");
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new MyDefaultObserver<LzyResponse<PageBean<ArticleListBean>>>(mMainActivity) {
+                    @Override
+                    public void onNext(LzyResponse<PageBean<ArticleListBean>> pageBeanLzyResponse) {
+                        ToastUtils.show(pageBeanLzyResponse.getData().getDatas().get(0).getDesc());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        //关闭dialog
+                        LogUtils.info("关闭dialog");
+                        mTv.setText("关闭dialog");
+                        dismissLoading();
+                    }
+                });
 
     }
 
@@ -362,7 +439,7 @@ public class MainActivity extends BaseRxActivity {
                 .map(new Function<LzyResponse<List<String>>, List<String>>() {
                     @Override
                     public List<String> apply(LzyResponse<List<String>> listLzyResponse) throws Exception {
-                        return listLzyResponse.data;
+                        return listLzyResponse.getData();
                     }
                 })//
                 .observeOn(AndroidSchedulers.mainThread())//
@@ -386,7 +463,7 @@ public class MainActivity extends BaseRxActivity {
                 .map(new Function<LzyResponse<String>, String>() {
                     @Override
                     public String apply(LzyResponse<String> stringLzyResponse) throws Exception {
-                        return stringLzyResponse.data;
+                        return stringLzyResponse.getData();
                     }
                 })//
                 .observeOn(AndroidSchedulers.mainThread())//
@@ -502,7 +579,7 @@ public class MainActivity extends BaseRxActivity {
                     @Override
                     public String apply(LzyResponse<String> stringLzyResponse) throws Exception {
 
-                        return stringLzyResponse.data;
+                        return stringLzyResponse.getData();
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())

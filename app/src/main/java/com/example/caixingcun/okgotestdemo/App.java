@@ -1,6 +1,7 @@
 package com.example.caixingcun.okgotestdemo;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.cache.CacheEntity;
@@ -28,10 +29,16 @@ import okhttp3.OkHttpClient;
  */
 
 public class App extends Application {
+    private static Context mContext;
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = this;
         initOkGo();
+    }
+
+    public static Context getContext() {
+        return mContext;
     }
 
     private void initOkGo() {

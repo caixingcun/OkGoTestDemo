@@ -33,13 +33,21 @@ public class SimpleResponse implements Serializable {
 
     private static final long serialVersionUID = -1477609349345966116L;
 
-    public int code;
-    public String msg;
+    public int errorCode;
+    public String errorMsg;
 
     public LzyResponse toLzyResponse() {
         LzyResponse lzyResponse = new LzyResponse();
-        lzyResponse.code = code;
-        lzyResponse.msg = msg;
+        lzyResponse.setErrorCode(getErrorCode());
+        lzyResponse.setErrorMsg(getErrorMsg());
         return lzyResponse;
+    }
+
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
     }
 }

@@ -15,6 +15,7 @@
  */
 package com.example.caixingcun.okgotestdemo.callback;
 
+import com.example.caixingcun.okgotestdemo.exception.ErrorCodeException;
 import com.example.caixingcun.okgotestdemo.model.LzyResponse;
 import com.example.caixingcun.okgotestdemo.model.SimpleResponse;
 import com.example.caixingcun.okgotestdemo.util.Convert;
@@ -149,19 +150,15 @@ public class JsonConvert<T> implements Converter<T> {
                 // 泛型格式如下： new JsonCallback<LzyResponse<内层JavaBean>>(this)
                 LzyResponse lzyResponse = Convert.fromJson(jsonReader, type);
                 response.close();
-                int code = lzyResponse.code;
+                int code = lzyResponse.getErrorCode();
+                String errorMsg = lzyResponse.getErrorMsg();
                 //这里的0是以下意思
                 //一般来说服务器会和客户端约定一个数表示成功，其余的表示失败，这里根据实际情况修改
                 if (code == 0) {
                     //noinspection unchecked
                     return (T) lzyResponse;
-                } else if (code == 104) {
-                    throw new IllegalStateException("用户授权信息无效");
-                } else if (code == 105) {
-                    throw new IllegalStateException("用户收取信息已过期");
                 } else {
-                    //直接将服务端的错误信息抛出，onError中可以获取
-                    throw new IllegalStateException("错误代码：" + code + "，错误信息：" + lzyResponse.msg);
+                    throw new ErrorCodeException("错误码-" + code + "-错误信息" + errorMsg);
                 }
             }
         }

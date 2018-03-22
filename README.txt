@@ -9,7 +9,8 @@
 
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.2'
-
+#  Demo 下的 几个包 得拷贝  base  callback  model  utils  以及 App
+   net 下是对于请求 进行二次封装 喜欢可以拷贝使用  不喜欢 直接 rx连点也可以
 # 主要样例代码
     几种请求样式  文件上传下载  MainActivity
 

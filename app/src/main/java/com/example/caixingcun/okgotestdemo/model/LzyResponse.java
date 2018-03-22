@@ -30,17 +30,39 @@ import java.io.Serializable;
 public class LzyResponse<T> implements Serializable {
 
     private static final long serialVersionUID = 5213230387175987834L;
-
-    public int code;
-    public String msg;
-    public T data;
+    /**
+     * 字段变化 只改动这几个字段名
+     */
+    private int errorCode;
+    private String errorMsg;
+    private T data;
 
     @Override
     public String toString() {
         return "LzyResponse{\n" +//
-               "\tcode=" + code + "\n" +//
-               "\tmsg='" + msg + "\'\n" +//
+               "\tcode=" + errorCode + "\n" +//
+               "\tmsg='" + errorMsg + "\'\n" +//
                "\tdata=" + data + "\n" +//
                '}';
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
     }
 }

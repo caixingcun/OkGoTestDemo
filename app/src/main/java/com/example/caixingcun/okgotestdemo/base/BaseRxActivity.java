@@ -10,7 +10,7 @@ import io.reactivex.disposables.Disposable;
  *  Rx防泄露
  */
 
-public class BaseRxActivity extends AppCompatActivity {
+public class BaseRxActivity extends BaseActivity {
     private CompositeDisposable mCompositeDisposable;
 
     public void addDisposable(Disposable disposable) {
